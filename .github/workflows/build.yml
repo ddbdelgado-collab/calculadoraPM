@@ -42,7 +42,15 @@ jobs:
       - name: Create Buildozer Config Cache Directory
         run: mkdir -p ~/.buildozer
 
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - name: Build APK
+        env:
+          ANDROID_NDK_HOME: ""
+          ANDROID_NDK_ROOT: ""
+          ANDROID_NDK_LATEST_HOME: ""
         run: |
           buildozer android debug 2>&1 | tee build.log
         continue-on-error: false
@@ -60,6 +68,3 @@ jobs:
         with:
           name: build-logs
           path: build.log
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | -v ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
