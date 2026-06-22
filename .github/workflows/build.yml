@@ -60,3 +60,6 @@ jobs:
         with:
           name: build-logs
           path: build.log
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | -v ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
