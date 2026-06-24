@@ -52,8 +52,7 @@ jobs:
           ANDROID_NDK_ROOT: ""
           ANDROID_NDK_LATEST_HOME: ""
         run: |
-          buildozer android debug 2>&1 | tee build.log
-        continue-on-error: false
+          buildozer android debug
 
       - name: Upload APK
         if: success()
@@ -61,6 +60,7 @@ jobs:
         with:
           name: apk
           path: bin/*.apk
+          if-no-files-found: error
 
       - name: Upload Build Logs
         if: failure()
