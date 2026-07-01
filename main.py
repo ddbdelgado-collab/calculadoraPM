@@ -1,108 +1,132 @@
-from kivymd.app import MDApp
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.gridlayout import MDGridLayout
-from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.textfield import MDTextField
-from kivy.core.window import Window
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 
+# --- DISEÑO MEJORADO ---
+kv_design = """
+<CalculatorWidget>:
+    orientation: 'vertical'
+    padding: 10
+    spacing: 10
 
-class CalculadoraApp(MDApp):
-    def build(self):
-        self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "BlueGray"
-        self.theme_cls.accent_palette = "Blue"
-        
-        layout_principal = MDBoxLayout(
-            orientation='vertical', 
-            padding="20dp", 
-            spacing="15dp"
-        )
-        
-        self.pantalla = MDTextField(
-            text="",
-            halign="right",
-            font_size="48sp",
-            readonly=True,
-            mode="rectangle", 
-            size_hint_y=None,
-            height="100dp"
-        )
-        layout_principal.add_widget(self.pantalla)
-        
-        grid_botones = MDGridLayout(
-            cols=4, 
-            spacing="10dp", 
-            size_hint_y=1
-        )
-        
-        botones = [
-            'C', '(', ')', '÷',
-            '7', '8', '9', 'x',
-            '4', '5', '6', '-',
-            '1', '2', '3', '+',
-            '0', '.', 'DEL', '='
-        ]
-        
-        for texto in botones:
-            fondo = self.theme_cls.bg_darkest
-            texto_color = self.theme_cls.text_color
-            
-            if texto in ['÷', 'x', '-', '+', '(', ')']:
-                fondo = self.theme_cls.primary_color
-                texto_color = [1, 1, 1, 1]
-                
-            elif texto == 'C':
-                fondo = self.theme_cls.error_color
-                texto_color = [1, 1, 1, 1]
-                
-            elif texto == '=':
-                fondo = self.theme_cls.accent_color
-                texto_color = [1, 1, 1, 1]
-                
-            elif texto == 'DEL':
-                fondo = self.theme_cls.primary_dark
-                texto_color = [1, 1, 1, 1]
+    TextInput:
+        id: txt_input
+        multiline: False
+        readonly: True
+        halign: "right"
+        font_size: 40
+        size_hint_y: 0.2
+        background_color: (0.1, 0.1, 0.1, 1)
+        foreground_color: (1, 1, 1, 1)
 
-            boton = MDRaisedButton(
-                text=texto,
-                size_hint=(1, 1),
-                font_size="24sp",
-                md_bg_color=fondo,
-                theme_text_color="Custom",
-                text_color=texto_color,
-                elevation=2,
-                on_release=self.al_presionar_boton
-            )
-            grid_botones.add_widget(boton)
-            
-        layout_principal.add_widget(grid_botones)
-        return layout_principal
-
-    def al_presionar_boton(self, instancia):
-        texto_actual = self.pantalla.text
-        texto_boton = instancia.text
+    GridLayout:
+        cols: 4
+        spacing: 5
         
-        if texto_boton == 'C':
-            self.pantalla.text = ""
-            
-        elif texto_boton == 'DEL':
-            self.pantalla.text = texto_actual[:-1]
-            
-        elif texto_boton == '=':
-            if texto_actual:
-                try:
-                    texto_matematico = texto_actual.replace('x', '*').replace('÷', '/')
-                    resultado = str(eval(texto_matematico))
-                    self.pantalla.text = resultado
-                except ZeroDivisionError:
-                    self.pantalla.text = "Error: Div/0"
-                except Exception:
-                    self.pantalla.text = "Error de sintaxis"
-                    
+        # Fila 1
+        Button:
+            text: "7"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "8"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "9"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "/"
+            background_color: (0.7, 0.5, 0.2, 1)
+            on_press: root.on_button_press(self)
+
+        # Fila 2
+        Button:
+            text: "4"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "5"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "6"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "*"
+            background_color: (0.7, 0.5, 0.2, 1)
+            on_press: root.on_button_press(self)
+
+        # Fila 3
+        Button:
+            text: "1"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "2"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "3"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "-"
+            background_color: (0.7, 0.5, 0.2, 1)
+            on_press: root.on_button_press(self)
+
+        # Fila 4
+        Button:
+            text: "."
+            on_press: root.on_button_press(self)
+        Button:
+            text: "0"
+            on_press: root.on_button_press(self)
+        Button:
+            text: "C"
+            background_color: (0.8, 0.2, 0.2, 1)
+            on_press: root.on_button_press(self)
+        Button:
+            text: "+"
+            background_color: (0.7, 0.5, 0.2, 1)
+            on_press: root.on_button_press(self)
+
+    Button:
+        text: "="
+        size_hint_y: 0.15
+        background_color: (0.2, 0.6, 0.2, 1)
+        on_press: root.on_solution()
+"""
+
+class CalculatorWidget(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.operators = ["+", "-", "*", "/"]
+        self.last_was_operator = None
+
+    def on_button_press(self, instance):
+        current = self.ids.txt_input.text
+        button_text = instance.text
+
+        if button_text == "C":
+            self.ids.txt_input.text = ""
         else:
-            if "Error" in texto_actual:
-                texto_actual = ""
-            self.pantalla.text = texto_actual + texto_boton
+            if current and (self.last_was_operator and button_text in self.operators):
+                return
+            elif current == "" and button_text in self.operators:
+                return
+            else:
+                self.ids.txt_input.text = current + button_text
 
-if __name__ == '__main__':
-    CalculadoraApp().run()
+        self.last_was_operator = button_text in self.operators
+
+    def on_solution(self):
+        text = self.ids.txt_input.text
+        if text:
+            try:
+                solution = str(eval(text))
+                self.ids.txt_input.text = solution
+            except Exception:
+                self.ids.txt_input.text = "Error"
+
+class CalculatorApp(App):
+    def build(self):
+        Builder.load_string(kv_design)
+        return CalculatorWidget()
+
+if __name__ == "__main__":
+    CalculatorApp().run()
